@@ -1,6 +1,24 @@
 <?php 
-	namespace soil;
-	require_once('/app/controllers/init.php');
+	require_once('../../../controllers/init.php');
+	if(Input::exists()){
+		if(Token::check(Input::get('token'))){
+			$validate = new Validate;
+			$validation = $validate->check($_POST, array(
+				'email' => array('required' => true),
+				'password' => array('required' => true)
+			));
+			if($validation->passed()){
+				$user = new User;
+				$user->login();
+			}
+			else{
+				foreach($validation->errors() as $error){
+					echo $error . '<br/>';
+				}
+			}
+		}
+		
+	}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -34,12 +52,17 @@
 					<img src="../../../public/login_stuff/images/img-01.png" alt="IMG">
 				</div>
 
-				<form class="login100-form validate-form">
+				<form class="login100-form validate-form" method="POST" action="">
+					<?php 
+						if(Session::exists('register_success')){
+							echo Session::flash('register_success');
+						}
+					?>
 					<span class="login100-form-title">
 						Member Login
 					</span>
 
-					<div class="wrap-input100 validate-input" data-validate = "Valid email is required: ex@abc.xyz">
+					<div class="wrap-input100" > <!-- class = "validate-input --><!-- data-validate = "Valid email is required: ex@abc.xyz" -->
 						<input class="input100" type="text" name="email" placeholder="Email">
 						<span class="focus-input100"></span>
 						<span class="symbol-input100">
@@ -47,8 +70,8 @@
 						</span>
 					</div>
 
-					<div class="wrap-input100 validate-input" data-validate = "Password is required">
-						<input class="input100" type="password" name="pass" placeholder="Password">
+					<div class="wrap-input100" > <!-- class = "validate-input --> <!-- data-validate = "Password is required" -->
+						<input class="input100" type="password" name="password" placeholder="Password">
 						<span class="focus-input100"></span>
 						<span class="symbol-input100">
 							<i class="fa fa-lock" aria-hidden="true"></i>
@@ -71,11 +94,12 @@
 					</div>
 
 					<div class="text-center p-t-136">
-						<a class="txt2" href="#">
+						<a class="txt2" href="register.php">
 							Create your Account
 							<i class="fa fa-long-arrow-right m-l-5" aria-hidden="true"></i>
 						</a>
 					</div>
+					<input type="hidden" name="token" id="token" value = "<?php echo Token::generate();?>">
 				</form>
 			</div>
 		</div>

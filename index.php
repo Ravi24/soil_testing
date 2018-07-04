@@ -1,6 +1,6 @@
 <?php
-	//header("location:views/pages/index.php");
-require_once('controllers/init.php');
+	header("location:views/templates/login/login.php");
+//require_once('controllers/init.php');
 
 //$user = Db::getInstance()->query("select * from users where name = ?",array('Ravi'));
 //$user = Db::getInstance()->get('users',array('name','=','bitcodes'));
@@ -19,11 +19,16 @@ require_once('controllers/init.php');
 //	}
 //}
 
-$keys = Db::getInstance()->update('users',array(
-	'name' => 'testy',
-	'email' => 'email@gmail.com'
-), array('id' => 1));
 
-print_r($keys);
+
+
+// Update records
+//$keys = Db::getInstance()->update('users',array(
+//	'name' => 'testUpdate',
+//	'email' => 'emailTest@gmail.com',
+//	'code' => '1111'
+//), array('id' => 2));
+
+echo Db::getInstance()->count().'Rows affected';
 
 

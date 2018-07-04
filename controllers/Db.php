@@ -3,7 +3,7 @@
 require_once 'init.php';
 Class Db{
 	private static $_instance = null;
-	private  $_pdo, $_query, $_error = false, $_results, $_count;
+	private  $_pdo, $_query, $_error = false, $_results, $_count= 0;
 
 ///This function is going to create a PDO  when you instantiate 'Db' Class;
 	private function __construct()
@@ -25,6 +25,8 @@ Class Db{
 		return self::$_instance;
 	}
 
+
+	// below function will prepare sql query and execte it.
 	public function query($sql, $params = array())
 	{
 		$this->_error = false;
@@ -60,13 +62,13 @@ Class Db{
 			$field = $where[0];
 			$operator = $where[1]; // $where[1] is the operator in where clause. here assingning it to $operator variable .
 			$value = $where[2];
-
 			if(in_array($operator, $operators)){ // in_array() function searches for the value in array.
-				$sql = "{$action} from {$tableName} where {$field} {$operator} ?";
+				$sql = "{$action} * from {$tableName} where {$field} {$operator} ?";
 				
 				/* calling query function which is written above and check if there is any error or not?
 				 i.e. execute query(which prepares the query and if there is any error it set $_error to true) function and check if there is any error or not.
 				 */
+
 				if(!$this->query($sql,array($value))->error()){
 					// if there is not an error return this otherwise return false.
 					return $this;
@@ -128,6 +130,7 @@ Class Db{
 					print_r($this->_query);
 					try{
 						$this->_query->execute();
+						$this->_count = $this->_query->rowCount();
 					}catch(PDOException $e){
 						die($e->getMessage());
 					}
@@ -135,6 +138,7 @@ Class Db{
 
 			}
 		}	
+		return false;
 	}
 	
 	public function insert($table, $fields = array()){
@@ -153,6 +157,7 @@ Class Db{
 			}
 			
 			$sql = "insert into {$table} (`". implode('`, `',$keys). "`) values({$values})";
+			echo $sql;
 			if(!$this->query($sql, $fields)->error())
 			{
 				return true;
@@ -175,6 +180,12 @@ Class Db{
 		return false;
 	}
 
+	public function find($tableName, $columnName, $whereColumn = array(0)){
+		//$sql = "select {$columnName} from {$tableName} where ";
+		return $this->action("select" , $tableName, $whereColumn);
+		//$this->query($sql,$whereColumn);
+	}
+
 	public function count(){
 		return $this->_count;
 	}
@@ -183,11 +194,4 @@ Class Db{
 	{
 		return $this->_error;
 	}
-
-
-
 }
-
-//https://www.youtube.com/watch?v=PaBWDOBFxDc
-
-//https://www.youtube.com/watch?v=FCnZsU19jyo
